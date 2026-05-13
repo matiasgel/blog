@@ -1,0 +1,99 @@
+{% extends "blog/base.html" %}
+
+{% block title %}
+  {% if object %}Editar publicación{% else %}Nueva publicación{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    <h1 class="mb-4">
+      {% if object %}Editar: <em>{{ object.title }}</em>{% else %}Nueva publicación{% endif %}
+    </h1>
+
+    <!--
+      novalidate: desactiva la validación del navegador (HTML5)
+      → Django tiene control total sobre los mensajes de error
+      → Patrón PRG: POST válido → redirect(success_url) → GET (evita doble submit)
+    -->
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <!-- Errores no asociados a un campo específico -->
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {% for error in form.non_field_errors %}
+            <p class="mb-0">{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Campo: título -->
+      <div class="mb-3">
+        <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
+          {{ form.title.label }}
+        </label>
+        {{ form.title }}
+        {% if form.title.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in form.title.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Campo: cuerpo -->
+      <div class="mb-3">
+        <label for="{{ form.body.id_for_label }}" class="form-label fw-semibold">
+          {{ form.body.label }}
+        </label>
+        {{ form.body }}
+        {% if form.body.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in form.body.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+        <div class="form-text">Mínimo 100 caracteres para publicar.</div>
+      </div>
+
+      <!-- Campo: categoría (ModelChoiceField → Select) -->
+      <div class="mb-3">
+        <label for="{{ form.category.id_for_label }}" class="form-label fw-semibold">
+          {{ form.category.label }}
+        </label>
+        {{ form.category }}
+        {% if form.category.errors %}
+          <div class="invalid-feedback d-block">
+            {% for error in form.category.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Campo: etiquetas (ModelMultipleChoiceField → SelectMultiple) -->
+      <div class="mb-3">
+        <label for="{{ form.tags.id_for_label }}" class="form-label fw-semibold">
+          {{ form.tags.label }}
+        </label>
+        {{ form.tags }}
+        <div class="form-text">Ctrl+clic para seleccionar múltiples.</div>
+      </div>
+
+      <!-- Campo: publicado (BooleanField → CheckboxInput) -->
+      <div class="mb-3 form-check">
+        {{ form.published }}
+        <label class="form-check-label" for="{{ form.published.id_for_label }}">
+          {{ form.published.label }}
+        </label>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+          {% if object %}Guardar cambios{% else %}Crear publicación{% endif %}
+        </button>
+        <a href="{% url 'blog:post-list' %}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+
+    </form>
+  </div>
+</div>
+{% endblock %}

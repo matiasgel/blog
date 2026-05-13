@@ -1,0 +1,203 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "admin",
+      "email": "admin@blogapp.com",
+      "first_name": "Admin",
+      "last_name": "BlogApp",
+      "is_staff": true,
+      "is_superuser": true,
+      "is_active": true,
+      "password": "pbkdf2_sha256$720000$fixture$Hb6DwRf1PpLoEGH3TiDNkv/YGiF2v85FHMlf3JnMJFw="
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "username": "maria",
+      "email": "maria@blogapp.com",
+      "first_name": "María",
+      "last_name": "García",
+      "is_staff": false,
+      "is_superuser": false,
+      "is_active": true,
+      "password": "pbkdf2_sha256$720000$fixture$Hb6DwRf1PpLoEGH3TiDNkv/YGiF2v85FHMlf3JnMJFw="
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "username": "juan",
+      "email": "juan@blogapp.com",
+      "first_name": "Juan",
+      "last_name": "Pérez",
+      "is_staff": false,
+      "is_superuser": false,
+      "is_active": true,
+      "password": "pbkdf2_sha256$720000$fixture$Hb6DwRf1PpLoEGH3TiDNkv/YGiF2v85FHMlf3JnMJFw="
+    }
+  },
+  {
+    "model": "blog.category",
+    "pk": 1,
+    "fields": { "name": "Django", "slug": "django" }
+  },
+  {
+    "model": "blog.category",
+    "pk": 2,
+    "fields": { "name": "Python", "slug": "python" }
+  },
+  {
+    "model": "blog.category",
+    "pk": 3,
+    "fields": { "name": "Bases de Datos", "slug": "bases-de-datos" }
+  },
+  {
+    "model": "blog.tag",
+    "pk": 1,
+    "fields": { "name": "ORM", "slug": "orm" }
+  },
+  {
+    "model": "blog.tag",
+    "pk": 2,
+    "fields": { "name": "Views", "slug": "views" }
+  },
+  {
+    "model": "blog.tag",
+    "pk": 3,
+    "fields": { "name": "Templates", "slug": "templates" }
+  },
+  {
+    "model": "blog.tag",
+    "pk": 4,
+    "fields": { "name": "Formularios", "slug": "formularios" }
+  },
+  {
+    "model": "blog.post",
+    "pk": 1,
+    "fields": {
+      "title": "Introducción a las vistas basadas en clases en Django",
+      "body": "Las vistas basadas en clases (CBV) son una de las características más poderosas de Django. A diferencia de las vistas de función, las CBV permiten reutilizar código mediante herencia y mixins. La clase base `View` expone el método `dispatch()`, que determina qué handler ejecutar según el verbo HTTP de la petición entrante. Al sobreescribir `get()` o `post()`, la subclase solo define la lógica específica del verbo, delegando el despacho al padre. Las vistas genéricas como `ListView`, `DetailView`, `CreateView`, `UpdateView` y `DeleteView` encapsulan patrones completos del ciclo CRUD, reduciendo el código necesario a la configuración mínima.",
+      "author": 1,
+      "category": 1,
+      "tags": [2],
+      "published": true,
+      "created_at": "2026-03-10T09:00:00Z",
+      "updated_at": "2026-03-10T09:00:00Z"
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 2,
+    "fields": {
+      "title": "El sistema de URLconf en Django: resolución e inversión de rutas",
+      "body": "El URLconf es el componente que mapea URLs a vistas. Se define como una lista `urlpatterns` en un módulo Python ordinario. Django recorre la lista en orden y despacha al primer patrón que coincide. Si ninguno coincide, devuelve automáticamente un `Http404`. Los conversores de tipo como `<int:pk>` ofrecen validación en la capa de ruteo: si el segmento de URL no puede convertirse al tipo indicado, el error se devuelve antes de ejecutar ninguna línea de código Python de la vista. La resolución inversa con `reverse()` y `{% url %}` desacopla las URLs del código, haciendo la aplicación reubicable sin cambios en vistas ni templates.",
+      "author": 2,
+      "category": 1,
+      "tags": [2, 3],
+      "published": true,
+      "created_at": "2026-03-12T10:30:00Z",
+      "updated_at": "2026-03-12T10:30:00Z"
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 3,
+    "fields": {
+      "title": "Django Template Language: herencia y contexto en templates",
+      "body": "El DTL (Django Template Language) permite estructurar las vistas HTML mediante herencia de templates. Un template base define bloques con `{% block nombre %}`, y los templates hijos los sobreescriben con `{% extends %}`. Esta arquitectura garantiza que cambios estructurales (navbar, estilos, scripts) se apliquen a toda la aplicación desde un único archivo. Las vistas genéricas transfieren variables al contexto automáticamente: `ListView` provee `object_list`, `page_obj`, `paginator` e `is_paginated`. `get_context_data()` permite agregar variables propias, pero siempre llamando a `super()` para no perder las automáticas. La dot notation del DTL resuelve atributos, claves de diccionario, índices y llama métodos sin paréntesis.",
+      "author": 1,
+      "category": 1,
+      "tags": [3],
+      "published": true,
+      "created_at": "2026-03-15T11:00:00Z",
+      "updated_at": "2026-03-15T11:00:00Z"
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 4,
+    "fields": {
+      "title": "Formularios en Django: ModelForm y el pipeline de validación",
+      "body": "Los formularios en Django siguen un pipeline de validación de cinco capas: `to_python()`, `validate()`, `run_validators()`, `clean_<campo>()` y `clean()`. `ModelForm` genera automáticamente los campos a partir del modelo, evitando duplicaciones. El ciclo PRG (Post-Redirect-Get) previene envíos duplicados: ante un POST válido, la vista redirige en lugar de renderizar directamente. El template del formulario es idéntico para creación y edición; la diferencia la determina el parámetro `instance=` al construir el formulario. Sin `instance`, `form.save()` hace INSERT. Con `instance`, hace UPDATE sobre el registro existente.",
+      "author": 3,
+      "category": 1,
+      "tags": [4, 2],
+      "published": true,
+      "created_at": "2026-03-18T14:00:00Z",
+      "updated_at": "2026-03-18T14:00:00Z"
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 5,
+    "fields": {
+      "title": "El problema N+1 y select_related / prefetch_related en Django ORM",
+      "body": "El problema N+1 es uno de los errores de rendimiento más comunes en aplicaciones Django. Ocurre cuando un template itera sobre una colección y accede a relaciones de cada elemento sin que estén precargadas. Por ejemplo, `{% for post in posts %}{{ post.category.name }}{% endfor %}` dentro de un queryset sin `select_related` ejecuta una consulta SQL por cada post. `select_related` resuelve las FK mediante un JOIN en la consulta principal. `prefetch_related` realiza una consulta separada y cachea el resultado para relaciones inversas (reverse FK) y muchos a muchos. La solución correcta está en `get_queryset()`, no en el template.",
+      "author": 2,
+      "category": 2,
+      "tags": [1],
+      "published": true,
+      "created_at": "2026-03-20T09:30:00Z",
+      "updated_at": "2026-03-20T09:30:00Z"
+    }
+  },
+  {
+    "model": "blog.post",
+    "pk": 6,
+    "fields": {
+      "title": "Borrador: Sesiones en Django (trabajo en progreso)",
+      "body": "Este es un borrador que no está publicado aún.",
+      "author": 1,
+      "category": 1,
+      "tags": [],
+      "published": false,
+      "created_at": "2026-03-22T08:00:00Z",
+      "updated_at": "2026-03-22T08:00:00Z"
+    }
+  },
+  {
+    "model": "blog.comment",
+    "pk": 1,
+    "fields": {
+      "post": 1,
+      "author": 2,
+      "body": "Excelente explicación sobre dispatch(). Nunca había entendido bien por qué sobreescribir get() y no dispatch() directamente.",
+      "created_at": "2026-03-10T15:00:00Z"
+    }
+  },
+  {
+    "model": "blog.comment",
+    "pk": 2,
+    "fields": {
+      "post": 1,
+      "author": 3,
+      "body": "¿Cuál es la diferencia entre usar LoginRequiredMixin y sobreescribir dispatch() para verificar autenticación?",
+      "created_at": "2026-03-11T09:00:00Z"
+    }
+  },
+  {
+    "model": "blog.comment",
+    "pk": 3,
+    "fields": {
+      "post": 2,
+      "author": 3,
+      "body": "El ejemplo de reverse_lazy() me salvó. Estaba usando reverse() en success_url y obtenía error al importar el módulo.",
+      "created_at": "2026-03-13T10:00:00Z"
+    }
+  },
+  {
+    "model": "blog.comment",
+    "pk": 4,
+    "fields": {
+      "post": 5,
+      "author": 1,
+      "body": "El punto sobre prefetch_related para relaciones inversas es clave. En mi proyecto estaba generando 200 queries por página y no entendía por qué.",
+      "created_at": "2026-03-21T11:00:00Z"
+    }
+  }
+]
