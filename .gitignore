@@ -1,5 +1,4 @@
 # Entorno virtual — se crea localmente con: python -m venv .venv
-.venv/
 
 # Base de datos SQLite local
 db.sqlite3
