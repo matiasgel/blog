@@ -51,7 +51,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "blog_project.wsgi.application"
-
+LOGIN_REDIRECT_URL = "/"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",

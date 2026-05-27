@@ -71,3 +71,57 @@ class CommentForm(forms.ModelForm):
         }
         labels = {"body": "Comentario"}
         error_messages = {"body": {"required": "El comentario no puede estar vacío."}}
+
+
+class RawForm(forms.Form):
+    """Formulario para crear publicaciones usando directamente forms.Form."""
+
+    title = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Título de la publicación"}),
+        label="Título",
+        error_messages={"required": "El título es obligatorio."},
+    )
+    body = forms.CharField(
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 8}),
+        label="Contenido",
+        error_messages={"required": "El contenido es obligatorio."},
+    )
+    category = forms.ChoiceField(
+        choices=[],  # Las opciones deben ser configuradas dinámicamente
+        widget=forms.Select(attrs={"class": "form-select"}),
+        label="Categoría",
+    )
+    tags = forms.MultipleChoiceField(
+        choices=[],  # Las opciones deben ser configuradas dinámicamente
+        widget=forms.SelectMultiple(attrs={"class": "form-select", "size": 5}),
+        label="Etiquetas",
+    )
+    published = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        label="¿Publicar?",
+    )
+
+    def clean_title(self):
+        """Validación personalizada para el título."""
+        title = self.cleaned_data["title"].strip()
+        if len(title) < 10:
+            raise forms.ValidationError(
+                "Mínimo %(min)s caracteres.", params={"min": 10}
+            )
+        qs = Post.objects.filter(title__iexact=title)
+        if qs.exists():
+            raise forms.ValidationError("Ya existe una publicación con ese título.")
+        return title
+
+    def clean(self):
+        """Validación cruzada: publicar requiere contenido mínimo."""
+        cleaned = super().clean()
+        body = cleaned.get("body", "")
+        published = cleaned.get("published", False)
+        if published and len(body) < 50:
+            raise forms.ValidationError(
+                "Para publicar, el contenido debe tener al menos 50 caracteres."
+            )
+        return cleaned

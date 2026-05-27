@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import urls as auth_urls
 from .views import (
     PostListView,
     PostDetailView,
@@ -12,7 +13,6 @@ app_name = "blog"  # habilita namespace: {% url 'blog:post-list' %}
 urlpatterns = [
     # "" coincide con /blog/ (include consume el prefijo)
     path("", PostListView.as_view(), name="post-list"),
-
     # <int:pk> → Http404 automático si el segmento no es int
     path("posts/<int:pk>/", PostDetailView.as_view(), name="post-detail"),
 
