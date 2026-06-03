@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Comment, Post, Rating, Tag
+from .models import Category, Comment, Post, Rating, Tag, fotos
 
 
 @admin.register(Category)
@@ -62,3 +62,9 @@ class RatingAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+    
+    
+@admin.register(fotos)
+class FotosAdmin(admin.ModelAdmin):
+    list_display  = ["nombre", "image"]
+    search_fields = ["nombre"]

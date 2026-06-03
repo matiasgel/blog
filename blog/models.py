@@ -44,7 +44,15 @@ class PublishedManager(models.Manager):
             .order_by("-created_at")[:n]
         )
 
-
+class fotos(models.Model):
+    image      = models.ImageField(
+        upload_to="fotos/",
+        null=True,
+        blank=True,
+        verbose_name="Imagen",
+        help_text="Imagen opcional para la publicación",
+    )
+    nombre = models.CharField(max_length=100, verbose_name="Nombre de la imagen")
 class Post(models.Model):
     """Publicación del blog."""
     title      = models.CharField(max_length=200, verbose_name="Título")
