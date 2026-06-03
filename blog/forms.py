@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post, Comment
+from .models import Post, Comment, Rating
 
 
 class PostForm(forms.ModelForm):
@@ -8,12 +8,13 @@ class PostForm(forms.ModelForm):
     class Meta:
         model  = Post
         # auto_now_add/auto_now quedan excluidos automáticamente (editable=False)
-        fields = ["title", "body", "category", "tags", "published"]
+        fields = ["title", "body", "category", "tags", "image", "published"]
         widgets = {
             "title":     forms.TextInput(attrs={"class": "form-control", "placeholder": "Título de la publicación"}),
             "body":      forms.Textarea(attrs={"class": "form-control", "rows": 8}),
             "category":  forms.Select(attrs={"class": "form-select"}),
             "tags":      forms.SelectMultiple(attrs={"class": "form-select", "size": 5}),
+            "image":     forms.ClearableFileInput(attrs={"class": "form-control"}),
             "published": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
         labels = {
@@ -57,21 +58,53 @@ class PostForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
-    """Formulario para agregar comentarios a una publicación."""
+    """Formulario para agregar comentarios a una publicación.
+    Los campos author_name/author_email son obligatorios solo para anónimos
+    (validación en la vista, no en el form, para simplificar).
+    """
 
     class Meta:
         model  = Comment
-        fields = ["body"]
+        fields = ["author_name", "author_email", "body"]
         widgets = {
+            "author_name": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Tu nombre",
+            }),
+            "author_email": forms.EmailInput(attrs={
+                "class": "form-control",
+                "placeholder": "Tu email (opcional)",
+            }),
             "body": forms.Textarea(attrs={
                 "class": "form-control",
                 "rows": 3,
                 "placeholder": "Escribí tu comentario...",
             }),
         }
-        labels = {"body": "Comentario"}
+        labels = {
+            "author_name":  "Nombre",
+            "author_email": "Email",
+            "body":         "Comentario",
+        }
         error_messages = {"body": {"required": "El comentario no puede estar vacío."}}
 
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Si el usuario está logueado, ocultamos los campos de nombre/email
+        if user and user.is_authenticated:
+            self.fields.pop("author_name")
+            self.fields.pop("author_email")
+        else:
+            self.fields["author_name"].required = True
+
+
+class RatingForm(forms.Form):
+    """Formulario de puntaje (1-5 estrellas) para una publicación."""
+    value = forms.ChoiceField(
+        choices=[(i, f"{i} estrella{'s' if i > 1 else ''}") for i in range(1, 6)],
+        widget=forms.RadioSelect(attrs={"class": "form-check-input"}),
+        label="Tu puntaje",
+    )
 
 class RawForm(forms.Form):
     """Formulario para crear publicaciones usando directamente forms.Form."""

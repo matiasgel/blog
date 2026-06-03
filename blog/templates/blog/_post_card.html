@@ -1,0 +1,40 @@
+<div class="card mb-3 shadow-sm">
+  <div class="row g-0 align-items-stretch">
+    <div class="col-md-9">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <h5 class="card-title mb-2">
+            <a href="{% url 'blog:post-detail' post.pk %}" class="text-decoration-none">{{ post.title }}</a>
+          </h5>
+          {% if post.category %}
+            <span class="badge bg-secondary align-self-start">{{ post.category.name }}</span>
+          {% endif %}
+        </div>
+        <p class="card-text text-muted small mb-2">
+          Por <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
+          · {{ post.created_at|date:"d/m/Y" }}
+          · {{ post.comments.count }} comentario{{ post.comments.count|pluralize }}
+        </p>
+        <p class="card-text mb-3">{{ post.body|truncatewords:28 }}</p>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{% url 'blog:post-detail' post.pk %}" class="btn btn-sm btn-outline-primary">Leer</a>
+          {% if user.is_authenticated %}
+            <a href="{% url 'blog:post-update' post.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+            <a href="{% url 'blog:post-delete' post.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 d-none d-md-block">
+      {% if post.image %}
+        <img src="{{ post.image.url }}" alt="Imagen de {{ post.title }}" class="img-fluid rounded-end h-100 object-fit-cover"
+          style="min-height: 160px; width:100%;">
+      {% else %}
+        <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded-end"
+          style="min-height: 160px; width:100%;">
+          <span class="text-center small">Sin imagen<br>de portada</span>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>

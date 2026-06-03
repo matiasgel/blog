@@ -1,4 +1,4 @@
-{% extends "blog/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}{{ post.title }}{% endblock %}
 
@@ -25,37 +25,101 @@
         </div>
       {% endif %}
 
+      {% if post.image %}
+        <div class="mb-4">
+          <img src="{{ post.image.url }}" alt="Imagen de {{ post.title }}" class="img-fluid rounded">
+        </div>
+      {% endif %}
+
       <div class="mb-4">
         {{ post.body|linebreaks }}
       </div>
 
-      <div class="d-flex gap-2 mb-5">
-        <a href="{% url 'blog:post-update' post.pk %}" class="btn btn-outline-secondary btn-sm">Editar</a>
-        <a href="{% url 'blog:post-delete' post.pk %}" class="btn btn-outline-danger btn-sm">Eliminar</a>
+      <div class="d-flex gap-2 mb-4">
+        {% if user.is_authenticated %}
+          <a href="{% url 'blog:post-update' post.pk %}" class="btn btn-outline-secondary btn-sm">Editar</a>
+          <a href="{% url 'blog:post-delete' post.pk %}" class="btn btn-outline-danger btn-sm">Eliminar</a>
+        {% endif %}
         <a href="{% url 'blog:post-list' %}" class="btn btn-link btn-sm">← Volver</a>
       </div>
     </article>
 
+    <!-- Puntaje -->
+    <section class="mb-5">
+      <h5>Puntaje</h5>
+      <hr>
+      {% if rating_count %}
+        <p class="mb-2">
+          <span class="fs-4 fw-bold text-warning">{{ rating_avg }}★</span>
+          <span class="text-muted small">({{ rating_count }} voto{{ rating_count|pluralize }})</span>
+        </p>
+      {% else %}
+        <p class="text-muted small mb-2">Esta entrada aún no tiene puntaje.</p>
+      {% endif %}
+
+      {% if user_rating %}
+        <p class="text-success small">Ya votaste: <strong>{{ user_rating }}★</strong> — podés cambiar tu voto:</p>
+      {% endif %}
+
+      <form method="post" action="{% url 'blog:post-rate' post.pk %}" class="d-flex align-items-center gap-3 flex-wrap">
+        {% csrf_token %}
+        {% for radio in rating_form.value %}
+          <div class="form-check form-check-inline">
+            {{ radio.tag }}
+            <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-warning btn-sm">Votar</button>
+      </form>
+    </section>
+
     <!-- Comentarios -->
     <section>
-      <h4>Comentarios ({{ post.comments.count }})</h4>
+      <h4>Comentarios ({{ comments|length }})</h4>
       <hr>
-      {% for comment in post.comments.all %}
-        <div class="mb-3">
-          <strong>{{ comment.author.username }}</strong>
+      {% for comment in comments %}
+        <div class="mb-3 border-start border-2 ps-3">
+          <strong>{{ comment.get_author_display }}</strong>
           <span class="text-muted small">· {{ comment.created_at|date:"d/m/Y H:i" }}</span>
-          <p class="mt-1">{{ comment.body }}</p>
+          <p class="mt-1 mb-0">{{ comment.body }}</p>
         </div>
       {% empty %}
         <p class="text-muted">Sin comentarios todavía.</p>
       {% endfor %}
 
-      <!-- Formulario de comentario — novalidate: control total sobre validación -->
+      <!-- Formulario de comentario -->
       <div class="card mt-4">
-        <div class="card-header">Agregar comentario</div>
+        <div class="card-header">
+          {% if user.is_authenticated %}
+            Comentar como <strong>{{ user.username }}</strong>
+          {% else %}
+            Agregar comentario
+          {% endif %}
+        </div>
         <div class="card-body">
           <form method="post" novalidate>
             {% csrf_token %}
+
+            {% if not user.is_authenticated %}
+              <div class="mb-3">
+                <label for="{{ comment_form.author_name.id_for_label }}" class="form-label">
+                  {{ comment_form.author_name.label }} <span class="text-danger">*</span>
+                </label>
+                {{ comment_form.author_name }}
+                {% if comment_form.author_name.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in comment_form.author_name.errors %}{{ error }}{% endfor %}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="mb-3">
+                <label for="{{ comment_form.author_email.id_for_label }}" class="form-label">
+                  {{ comment_form.author_email.label }}
+                </label>
+                {{ comment_form.author_email }}
+              </div>
+            {% endif %}
+
             <div class="mb-3">
               <label for="{{ comment_form.body.id_for_label }}" class="form-label">
                 {{ comment_form.body.label }}
@@ -67,7 +131,13 @@
                 </div>
               {% endif %}
             </div>
-            <button type="submit" class="btn btn-primary">Enviar</button>
+
+            <div class="d-flex align-items-center gap-3">
+              <button type="submit" class="btn btn-primary">Enviar comentario</button>
+              {% if not user.is_authenticated %}
+                <span class="text-muted small">Tu comentario será revisado antes de publicarse.</span>
+              {% endif %}
+            </div>
           </form>
         </div>
       </div>

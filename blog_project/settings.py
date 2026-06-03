@@ -52,6 +52,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "blog_project.wsgi.application"
 LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/cuenta/login/"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -65,5 +66,7 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

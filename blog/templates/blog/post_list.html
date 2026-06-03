@@ -1,4 +1,4 @@
-{% extends "blog/base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Publicaciones — BlogApp{% endblock %}
 
@@ -9,36 +9,13 @@
   <div class="col-lg-8">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="h3">Publicaciones <span class="badge bg-secondary fs-6">{{ total_publicados }}</span></h1>
-      <a href="{% url 'blog:post-create' %}" class="btn btn-primary">+ Nueva</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'blog:post-create' %}" class="btn btn-primary">+ Nueva</a>
+      {% endif %}
     </div>
 
     {% for post in posts %}
-    matias
-    <div class="card mb-3 shadow-sm">
-      <div class="card-body">
-        <div class="d-flex justify-content-between">
-          <h5 class="card-title">
-            <a href="{% url 'blog:post-detail' post.pk %}" class="text-decoration-none">
-              {{ post.title }}
-            </a>
-          </h5>
-          {% if post.category %}
-            <span class="badge bg-secondary align-self-start">{{ post.category.name }}</span>
-          {% endif %}
-        </div>
-        <p class="card-text text-muted small">
-          Por <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
-          · {{ post.created_at|date:"d/m/Y" }}
-          · {{ post.comments.count }} comentario{{ post.comments.count|pluralize }}
-        </p>
-        <p class="card-text">{{ post.body|truncatewords:30 }}</p>
-        <div class="d-flex gap-2">
-          <a href="{% url 'blog:post-detail' post.pk %}" class="btn btn-sm btn-outline-primary">Leer</a>
-          <a href="{% url 'blog:post-update' post.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
-          <a href="{% url 'blog:post-delete' post.pk %}" class="btn btn-sm btn-outline-danger">Eliminar</a>
-        </div>
-      </div>
-    </div>
+      {% include "blog/_post_card.html" with post=post %}
     {% empty %}
       <div class="alert alert-info">No hay publicaciones publicadas todavía.</div>
     {% endfor %}
@@ -49,7 +26,7 @@
       <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">‹ Anterior</a>
+            <a class="page-link" href="?{% if categoria_activa %}categoria={{ categoria_activa }}&{% endif %}page={{ page_obj.previous_page_number }}">‹ Anterior</a>
           </li>
         {% endif %}
         <li class="page-item disabled">
@@ -57,7 +34,7 @@
         </li>
         {% if page_obj.has_next %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente ›</a>
+            <a class="page-link" href="?{% if categoria_activa %}categoria={{ categoria_activa }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente ›</a>
           </li>
         {% endif %}
       </ul>
@@ -69,10 +46,22 @@
   <!-- Sidebar -->
   <div class="col-lg-4">
     <div class="card shadow-sm">
-      <div class="card-header">Categorías</div>
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Categorías</span>
+        {% if categoria_activa %}
+          <a href="{% url 'blog:post-list' %}" class="badge bg-secondary text-decoration-none">✕ Limpiar</a>
+        {% endif %}
+      </div>
       <ul class="list-group list-group-flush">
         {% for cat in categorias %}
-          <li class="list-group-item">{{ cat.name }}</li>
+          <li class="list-group-item p-0">
+            <a href="?categoria={{ cat.slug }}"
+               class="d-block px-3 py-2 text-decoration-none
+               {% if cat.slug == categoria_activa %}fw-bold text-primary bg-light{% else %}text-dark{% endif %}">
+              {{ cat.name }}
+              {% if cat.slug == categoria_activa %}<span class="float-end">●</span>{% endif %}
+            </a>
+          </li>
         {% empty %}
           <li class="list-group-item text-muted">Sin categorías</li>
         {% endfor %}
