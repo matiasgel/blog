@@ -11,11 +11,12 @@ from django.views.generic import (
     DeleteView,
     DetailView,
     ListView,
+    TemplateView,
     UpdateView,
 )
 
 from .forms import CommentForm, PostForm, RatingForm
-from .models import Category, Post, Rating
+from .models import Category, Post, Rating, fotos
 
 
 class PostListView(ListView):
@@ -41,6 +42,21 @@ class PostListView(ListView):
         ctx["categorias"]        = Category.objects.all()
         ctx["total_publicados"]  = self.get_queryset().count()
         ctx["categoria_activa"]  = self.request.GET.get("categoria", "")
+        return ctx
+
+
+class FotosCarouselView(TemplateView):
+    """Página con carrusel Bootstrap de 10 fotos aleatorias."""
+    template_name = "blog/fotos_carousel.html"
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["fotos"] = (
+            fotos.objects
+            .filter(image__isnull=False)
+            .exclude(image="")
+            .order_by("?")[:10]
+        )
         return ctx
 
 
@@ -167,7 +183,7 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
 
 
 class PostDeleteView(LoginRequiredMixin, DeleteView):
-    """Confirma y elimina una publicación (requiere login)."""
+    """Confirma y elimina una publicación."""
     model         = Post
     template_name = "blog/post_confirm_delete.html"
     success_url   = reverse_lazy("blog:post-list")
@@ -195,6 +211,6 @@ class RegisterView(View):
             user.is_superuser = False
             user.save(update_fields=["is_staff", "is_superuser"])
             login(request, user)
-            messages.success(request, f"¡Bienvenido/a, {user.username}! Tu cuenta fue creada.")
+            messages.success(self.request, f"¡Bienvenido/a, {user.username}! Tu cuenta fue creada.")
             return redirect("blog:post-list")
         return render(request, self.template_name, {"form": form})
