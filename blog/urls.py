@@ -7,12 +7,14 @@ from .views import (
     PostUpdateView,
     PostDeleteView,
     RatePostView,
+    FotosCarouselView,
 )
 
 app_name = "blog"
 
 urlpatterns = [
     path("", PostListView.as_view(), name="post-list"),
+    path("fotos/", FotosCarouselView.as_view(), name="fotos-carousel"),
     path("posts/<int:pk>/", PostDetailView.as_view(), name="post-detail"),
     path("posts/crear/", PostCreateView.as_view(), name="post-create"),
     path("posts/<int:pk>/editar/", PostUpdateView.as_view(), name="post-update"),
